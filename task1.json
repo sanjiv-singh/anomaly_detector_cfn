@@ -1,0 +1,13 @@
+{
+    "AWSTemplateFormatVersion" : "2010-09-09",
+    "Description": "Task 1",
+    "Resources": {
+        "Task1KinesisStream": {
+            "Type" : "AWS::Kinesis::Stream",
+            "Properties" : {
+                "Name" : "RawDataStream",
+                "ShardCount": 1
+            }
+        }
+    }
+} 
