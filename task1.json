@@ -6,7 +6,7 @@
         "Description": "Name of the key pair to use",
         "Type": "String"
       },
-      "EmailAddress": {
+      "AnomalyAlertsEmail": {
           "Description": "Email address to be used as endpoint for SNS",
           "Type": "String"
       }
@@ -66,7 +66,7 @@
         }
       }
     },
-    "AnomalyAlertSNSTopic": {
+    "AnomalyAlertsSNSTopic": {
       "Type": "AWS::SNS::Topic",
       "Properties": {
         "DisplayName": "m03p02_anomaly_alerts",
@@ -74,14 +74,14 @@
         "TopicName": "m03p02_anomaly_alerts"
       }
     },
-    "MySubscription" : {
+    "AnomalyAlertsEmailSubscription" : {
       "Type" : "AWS::SNS::Subscription",
       "Properties" : {
-          "Endpoint" : {"Ref": "EmailAddress"},
+          "Endpoint" : {"Ref": "AnomalyAlertsEmail"},
           "Protocol" : "email",
-          "TopicArn" : { "Ref" : "AnomalyAlertSNSTopic" }
+          "TopicArn" : { "Ref" : "AnomalyAlertsSNSTopic" }
       },
-      "DependsOn": "AnomalyAlertSNSTopic"
+      "DependsOn": "AnomalyAlertsSNSTopic"
     }
   }
 } 

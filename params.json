@@ -1,6 +1,6 @@
 {
   "Parameters": {
     "KeyName": "gltest",
-    "EmailAddress": "sk.sanjiv@gmail.com"
+    "AnomalyAlertsEmail": "sk.sanjiv@gmail.com"
   }
 }
