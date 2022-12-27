@@ -24,5 +24,5 @@ task2() {
     aws s3 cp app.zip s3://$BUCKET_NAME/app.zip
 }
 
-#task1
+task1
 task2
