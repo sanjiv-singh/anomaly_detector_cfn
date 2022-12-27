@@ -1,66 +1,87 @@
 {
-    "AWSTemplateFormatVersion" : "2010-09-09",
-    "Description": "Task 1",
-    "Parameters": {
-        "EmailAddress": {
-            "Description": "Email address to be used as endpoint for SNS",
-            "Type": "String"
-        }
+  "AWSTemplateFormatVersion" : "2010-09-09",
+  "Description": "Task 1",
+  "Parameters": {
+      "KeyName": {
+        "Description": "Name of the key pair to use",
+        "Type": "String"
+      },
+      "EmailAddress": {
+          "Description": "Email address to be used as endpoint for SNS",
+          "Type": "String"
+      }
+  },
+  "Resources": {
+    "MySSHSecurityGroup": {
+      "Type" : "AWS::EC2::SecurityGroup",
+      "Properties" : {
+        "GroupName": "webapp-security-group",
+        "GroupDescription" : "Allow SSH inbound and outbound traffic",
+        "SecurityGroupIngress" : [{"IpProtocol": "tcp", "FromPort": 22, "ToPort": 22, "CidrIp": "0.0.0.0/0"}]
+      }
     },
-    "Resources": {
-        "Task1KinesisStream": {
-            "Type" : "AWS::Kinesis::Stream",
-            "Properties" : {
-                "Name" : "RawDataStream",
-                "ShardCount": 1
-            }
-        },
-        "Task1DynamoDBTable" : {
-            "Type" : "AWS::DynamoDB::Table",
-            "Properties" : {
-              "TableName" : "bsm-alert-data",
-              "AttributeDefinitions" : [
-                {
-                  "AttributeName" : "deviceid",
-                  "AttributeType" : "S"   
-                },
-                {
-                  "AttributeName" : "timestamp",
-                  "AttributeType" : "S"
-                }
-              ],
-              "KeySchema" : [
-                {
-                  "AttributeName" : "deviceid",
-                  "KeyType" : "HASH"
-                },
-                {
-                  "AttributeName" : "timestamp",
-                  "KeyType" : "RANGE"
-                }
-              ],
-              "ProvisionedThroughput" : {
-                "ReadCapacityUnits" : "5",
-                "WriteCapacityUnits" : "5"
-              }
-            }
-        },
-        "BSMSNSTopic": {
-            "Type": "AWS::SNS::Topic",
-            "Properties": {
-              "DisplayName": "BSMAlert",
-              "Subscription": [  ],
-              "TopicName": "BSMAlert"
-            }
-        },
-        "MySubscription" : {
-            "Type" : "AWS::SNS::Subscription",
-            "Properties" : {
-                "Endpoint" : {"Ref": "EmailAddress"},
-                "Protocol" : "email",
-                "TopicArn" : { "Ref" : "BSMSNSTopic" }
-            },
-            "DependsOn": "BSMSNSTopic"
+    "WebAppInstance": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "ImageId": "ami-0b5eea76982371e91",
+        "InstanceType": "t2.micro",
+        "KeyName": {"Ref": "KeyName"},
+        "SecurityGroupIds": [{"Ref": "MySSHSecurityGroup"}]
+      }
+    },
+    "Task1KinesisStream": {
+      "Type" : "AWS::Kinesis::Stream",
+      "Properties" : {
+          "Name" : "m03p02_raw_data_stream",
+          "ShardCount": 1
+      }
+    },
+    "Task1DynamoDBTable" : {
+      "Type" : "AWS::DynamoDB::Table",
+      "Properties" : {
+        "TableName" : "m03p02_anomaly_data",
+        "AttributeDefinitions" : [
+          {
+            "AttributeName" : "deviceid",
+            "AttributeType" : "S"   
+          },
+          {
+            "AttributeName" : "timestamp",
+            "AttributeType" : "S"
+          }
+        ],
+        "KeySchema" : [
+          {
+            "AttributeName" : "deviceid",
+            "KeyType" : "HASH"
+          },
+          {
+            "AttributeName" : "timestamp",
+            "KeyType" : "RANGE"
+          }
+        ],
+        "ProvisionedThroughput" : {
+          "ReadCapacityUnits" : "5",
+          "WriteCapacityUnits" : "5"
         }
+      }
+    },
+    "AnomalyAlertSNSTopic": {
+      "Type": "AWS::SNS::Topic",
+      "Properties": {
+        "DisplayName": "m03p02_anomaly_alerts",
+        "Subscription": [  ],
+        "TopicName": "m03p02_anomaly_alerts"
+      }
+    },
+    "MySubscription" : {
+      "Type" : "AWS::SNS::Subscription",
+      "Properties" : {
+          "Endpoint" : {"Ref": "EmailAddress"},
+          "Protocol" : "email",
+          "TopicArn" : { "Ref" : "AnomalyAlertSNSTopic" }
+      },
+      "DependsOn": "AnomalyAlertSNSTopic"
     }
+  }
 } 
