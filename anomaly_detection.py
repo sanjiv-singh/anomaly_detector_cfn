@@ -19,7 +19,7 @@ def lambda_handler(event, context):
     anomaly_table = dynamodb_res.Table('m03p02_anomaly_data')
 
     sns_client = boto3.client('sns', region_name=AWS_REGION)
-    topic_arn = "arn:aws:sns:us-east-1:755358636241:m03p02_anomaly_alerts"
+    topic_arn = "arn:aws:sns:us-east-1:279353633617:m03p02_anomaly_alerts"
 
     for record in event['Records']:
         data_point = base64.b64decode(record['kinesis']['data'])
