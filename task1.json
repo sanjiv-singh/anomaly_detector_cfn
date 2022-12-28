@@ -62,9 +62,10 @@
         "ImageId": "ami-0b5eea76982371e91",
         "InstanceType": "t2.micro",
         "KeyName": {"Ref": "KeyName"},
+        "Tags": [{"Key": "AppName", "Value": "MyApp" }],
         "IamInstanceProfile": {"Ref": "AppInstanceProfile"},
         "SecurityGroupIds": [{"Ref": "AppSSHSecurityGroup"}]
-      }
+      },
     },
     "Task1KinesisStream": {
       "Type" : "AWS::Kinesis::Stream",
