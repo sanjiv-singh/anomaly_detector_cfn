@@ -12,7 +12,9 @@ task1() {
     aws cloudformation deploy \
 	--stack-name task1stack \
 	--parameter-overrides file://params.json \
-	--template-file task1.json
+	--template-file task1.json \
+	--capabilities CAPABILITY_IAM
+
 }
 
 task2() {

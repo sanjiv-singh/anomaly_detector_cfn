@@ -12,21 +12,58 @@
       }
   },
   "Resources": {
-    "MySSHSecurityGroup": {
+    "AppRole" : {
+      "Type"  : "AWS::IAM::Role",
+      "Properties" : {
+          "AssumeRolePolicyDocument" : {
+            "Statement" : [ {
+                "Effect" : "Allow",
+                "Principal" : {
+                    "Service" : [ "ec2.amazonaws.com" ]
+                },
+                "Action" : [ "sts:AssumeRole" ]
+          } ]
+        },
+        "Path" : "/"
+      }
+    },
+    "AppRolePolicies" : {
+      "Type" : "AWS::IAM::Policy",
+      "Properties" : {
+          "PolicyName" : "app-role-policy",
+          "PolicyDocument" : {
+              "Statement" : [ {
+                  "Effect" : "Allow",
+                  "Action" : "kinesis:*",
+                  "Resource" :  {"Fn::GetAtt": ["Task1KinesisStream", "Arn"]}
+              }]
+          },
+          "Roles" : [ { "Ref" : "AppRole" } ]
+      }
+    },
+    "AppInstanceProfile" : {
+      "Type" : "AWS::IAM::InstanceProfile",
+      "Properties" : {
+          "Path" : "/",
+          "Roles" : [ { "Ref" : "AppRole" } ]
+      }
+    },
+    "AppSSHSecurityGroup": {
       "Type" : "AWS::EC2::SecurityGroup",
       "Properties" : {
-        "GroupName": "webapp-security-group",
+        "GroupName": "app-security-group",
         "GroupDescription" : "Allow SSH inbound and outbound traffic",
         "SecurityGroupIngress" : [{"IpProtocol": "tcp", "FromPort": 22, "ToPort": 22, "CidrIp": "0.0.0.0/0"}]
       }
     },
-    "WebAppInstance": {
+    "AppInstance": {
       "Type": "AWS::EC2::Instance",
       "Properties": {
         "ImageId": "ami-0b5eea76982371e91",
         "InstanceType": "t2.micro",
         "KeyName": {"Ref": "KeyName"},
-        "SecurityGroupIds": [{"Ref": "MySSHSecurityGroup"}]
+        "IamInstanceProfile": {"Ref": "AppInstanceProfile"},
+        "SecurityGroupIds": [{"Ref": "AppSSHSecurityGroup"}]
       }
     },
     "Task1KinesisStream": {
