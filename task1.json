@@ -34,7 +34,7 @@
           "PolicyDocument" : {
               "Statement" : [ {
                   "Effect" : "Allow",
-                  "Action" : "kinesis:*",
+                  "Action" : "kinesis:PutRecord",
                   "Resource" :  {"Fn::GetAtt": ["Task1KinesisStream", "Arn"]}
               }]
           },
