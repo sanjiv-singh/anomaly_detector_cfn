@@ -9,6 +9,10 @@
       "AnomalyAlertsEmail": {
           "Description": "Email address to be used as endpoint for SNS",
           "Type": "String"
+      },
+      "AppS3BucketName": {
+        "Description": "Name of the S3 Bucket where code will be pushed",
+        "Type": "String"
       }
   },
   "Resources": {
@@ -32,11 +36,25 @@
       "Properties" : {
           "PolicyName" : "app-role-policy",
           "PolicyDocument" : {
-              "Statement" : [ {
-                  "Effect" : "Allow",
-                  "Action" : "kinesis:PutRecord",
-                  "Resource" :  {"Fn::GetAtt": ["Task1KinesisStream", "Arn"]}
-              }]
+            "Statement" : [{
+                "Effect" : "Allow",
+                "Action" : "kinesis:PutRecord",
+                "Resource" :  {"Fn::GetAtt": ["Task1KinesisStream", "Arn"]}
+              },{
+                "Effect" : "Allow",
+                "Action" : "s3:GetObject",
+                "Resource" :  {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:s3:::",
+                      {"Ref": "AppS3BucketName"},
+                      "/*"
+                    ]
+                  ]
+                }
+              }
+            ]
           },
           "Roles" : [ { "Ref" : "AppRole" } ]
       }
@@ -62,10 +80,26 @@
         "ImageId": "ami-0b5eea76982371e91",
         "InstanceType": "t2.micro",
         "KeyName": {"Ref": "KeyName"},
-        "Tags": [{"Key": "AppName", "Value": "MyApp" }],
+        "Tags": [{"Key": "ec2-app-name", "Value": "my-app" }],
         "IamInstanceProfile": {"Ref": "AppInstanceProfile"},
-        "SecurityGroupIds": [{"Ref": "AppSSHSecurityGroup"}]
-      },
+        "SecurityGroupIds": [{"Ref": "AppSSHSecurityGroup"}],
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Join": ["\n", [
+              "#!/bin/bash",
+              "yum update -y",
+              "yum install -y python3",
+              "pip3 install --upgrade pip",
+              "pip3 install boto3",
+              "yum install -y ruby",
+              "cd /home/ec2-user",
+              {"Fn::Sub": "curl -O https://aws-codedeploy-${AWS::Region}.s3.amazonaws.com/latest/install"},
+              "chmod +x ./install",
+              "./install auto"
+            ]]
+          }
+        }
+      }
     },
     "Task1KinesisStream": {
       "Type" : "AWS::Kinesis::Stream",
