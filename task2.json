@@ -1,45 +1,12 @@
 {
-    "AWSTemplateFormatVersion" : "2010-09-09",
-    "Resources" : {
-      "AppS3Bucket" : {
-        "Type" : "AWS::S3::Bucket",
-        "Properties": {
-            "BucketName": "sanjivsingh-gl-app-bucket"
-        },
-        "DeletionPolicy" : "Retain"
+  "AWSTemplateFormatVersion" : "2010-09-09",
+  "Resources" : {
+    "AppS3Bucket" : {
+      "Type" : "AWS::S3::Bucket",
+      "Properties": {
+        "BucketName": "sanjivsingh-gl-app-bucket"
       },
-        "DeploymentGroup": {
-            "Type": "AWS::CodeDeploy::DeploymentGroup",
-            "Properties": {
-                "ApplicationName": {
-                    "Ref": "Application"
-                },
-                "Deployment": {
-                    "Description": "App Deployment",
-                    "IgnoreApplicationStopFailures": "true",
-                    "Revision": {
-                        "RevisionType": "S3",
-                        "S3Location": {
-                            "Bucket": {
-                                "Ref": "AppS3Bucket"
-                            },
-                            "Key": "app.zip",
-                            "BundleType": "Zip"
-                        }
-                    }
-                },
-                "Ec2TagFilters": [
-                    {
-                        "Key": {
-                            "Ref": "TagKey"
-                        },
-                        "Value": {
-                            "Ref": "TagValue"
-                        },
-                        "Type": "KEY_AND_VALUE"
-                    }
-                ]
-            }
-        }
+      "DeletionPolicy" : "Delete"
     }
   }
+}
