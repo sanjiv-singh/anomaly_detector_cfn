@@ -1,0 +1,61 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Parameters" : {
+      "KinesisStreamArn" : {
+        "Type" : "String"
+      }  
+    },
+    "Resources" : {
+    "LambdaExecutionRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [{ "Effect": "Allow", "Principal": {"Service": ["lambda.amazonaws.com"]}, "Action": ["sts:AssumeRole"] }]
+        },
+        "Path": "/",
+        "Policies": [{
+          "PolicyName": "root",
+          "PolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+              { "Effect": "Allow", "Action": ["logs:*"], "Resource": "arn:aws:logs:*:*:*" },
+              { "Effect": "Allow", "Action": [
+                "kinesis:GetRecords",
+                "kinesis:GetShardIterator",
+                "kinesis:DescribeStream",
+                "kinesis:ListStreams"
+              ], "Resource": {"Ref": "KinesisStreamArn"}
+            },
+            { "Effect": "Allow", "Action": ["dynamodb:*"], "Resource": "arn:aws:dynamodb:*:*:*"},
+            { "Effect": "Allow", "Action": ["sns:*"], "Resource": "arn:aws:sns:*:*:*"}
+            ]
+          }
+        }]
+      }
+    },
+    "AnomalyLambdaFunction": {
+        "Type": "AWS::Lambda::Function",
+        "Properties": {
+          "Handler": "anomaly_detection.lambda_handler",
+          "Role": { "Fn::GetAtt" : ["LambdaExecutionRole", "Arn"] },
+          "Code": {
+            "S3Bucket":  "sanjivsingh-gl-app-bucket",
+            "S3Key": "anomaly_lambda.zip"
+          },
+          "Runtime": "python3.8"
+        }
+      },
+      "LambdaKinesisEventSourceMapping": {
+        "Type": "AWS::Lambda::EventSourceMapping",
+        "DependsOn": "AnomalyLambdaFunction",
+        "Properties": {
+            "BatchSize": 5,
+            "Enabled": true,
+            "StartingPosition": "LATEST",
+            "EventSourceArn": {"Ref": "KinesisStreamArn"},
+            "FunctionName": {"Fn::GetAtt": ["AnomalyLambdaFunction", "Arn"]}
+        }
+      }
+    }
+  }
