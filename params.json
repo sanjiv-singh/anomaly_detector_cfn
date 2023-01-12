@@ -1,6 +1,7 @@
 {
   "Parameters": {
     "KeyName": "gltest",
-    "AnomalyAlertsEmail": "sk.sanjiv@gmail.com"
+    "AnomalyAlertsEmail": "sk.sanjiv@gmail.com",
+    "AppS3BucketName": "sanjivsingh-gl-app-bucket"
   }
 }
