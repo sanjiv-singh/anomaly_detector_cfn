@@ -12,8 +12,8 @@ task1() {
 
     aws cloudformation deploy \
 	--stack-name task1stack \
-	--parameter-overrides file://params.json \
-	--template-file task1.json \
+	--parameter-overrides file://templates/params.json \
+	--template-file templates/task1.json \
 	--capabilities CAPABILITY_IAM
 
 }
@@ -21,7 +21,7 @@ task1() {
 codedeploy_setup() {
     aws iam create-role \
         --role-name codedeploy-service-role \
-        --assume-role-policy-document file://code_policy.json
+        --assume-role-policy-document file://templates/code_policy.json
 
     aws iam attach-role-policy \
         --role-name codedeploy-service-role \
@@ -29,31 +29,32 @@ codedeploy_setup() {
     
     role_arn=$(aws iam get-role --role-name codedeploy-service-role --query "Role.Arn" --output text)
     
-    aws deploy create-application --application-name my-app
+    aws deploy create-application --application-name my-app --no-cli-pager
     
     aws deploy push \
       --application-name my-app \
       --s3-location s3://sanjivsingh-gl-app-bucket/app.zip \
-      --ignore-hidden-files
+      --ignore-hidden-files --no-cli-pager
     
     aws deploy create-deployment-group \
       --application-name my-app \
       --deployment-group-name my-app-group \
       --deployment-config-name CodeDeployDefault.OneAtATime \
       --ec2-tag-filters Key=ec2-app-name,Value=my-app,Type=KEY_AND_VALUE \
-      --service-role-arn $role_arn
+      --service-role-arn $role_arn --no-cli-pager
     
     aws deploy create-deployment \
       --application-name my-app \
       --deployment-config-name CodeDeployDefault.OneAtATime \
       --deployment-group-name my-app-group \
+      --no-cli-pager \
       --s3-location bucket=sanjivsingh-gl-app-bucket,bundleType=zip,key=app.zip
 }
 
 task2() {
     aws cloudformation deploy \
 	--stack-name task2stack \
-	--template-file task2.json
+	--template-file templates/task2.json
 
     codedeploy_setup
 }
@@ -68,7 +69,7 @@ task3() {
     aws cloudformation deploy \
 	--stack-name task3stack \
         --parameter-overrides "KinesisStreamArn=$stream_arn" \
-	--template-file task3.json \
+	--template-file templates/task3.json \
 	--capabilities CAPABILITY_IAM
 
 }

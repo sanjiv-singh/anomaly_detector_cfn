@@ -5,11 +5,11 @@ files:
       destination: /home/ec2-user/
 hooks:
     ApplicationStart:
-        - location: ../../../../../../home/ec2-user/start.sh
+        - location: ../../../../../../home/ec2-user/scripts/start.sh
           timeout: 300
           runas: ec2-user
     ApplicationStop:
-        - location: ../../../../../../home/ec2-user/stop.sh
+        - location: ../../../../../../home/ec2-user/scripts/stop.sh
           timeout: 300
           runas: ec2-user
 
