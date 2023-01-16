@@ -7,5 +7,4 @@ if [ -n "$pid" ]; then
 else
     echo "Not found"
 fi
-#killall -q -e python3 raw_data.py
 
