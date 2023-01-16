@@ -15,7 +15,7 @@ The `cleanup.sh` script is used to destroy the stacks and cleanup the infrastruc
 
 ## Setting up the Cloud Infrastructure
 
-The template expects two parameters, viz. `KeyName` (name of keypair), `AnomalyAlertsEmail` (the Email Address where alerts are to be sent) and `AppS3BucketName` (name of the S3 Bucket where the application and lambda handler code will be pushed for deployment in task2 and task3).
+The template expects three parameters, viz. `KeyName` (name of keypair), `AnomalyAlertsEmail` (the Email Address where alerts are to be sent) and `AppS3BucketName` (name of the S3 Bucket where the application and lambda handler code will be pushed for deployment in task2 and task3).
 
 The `deploy.sh` script may be used for running all the three tasks. For this to work, the above parameters must be stored in the `templates/params.json` file. The provided script runs on Linux (Unix) and Mac systems only. It is assumed that aws cli is installed on the system and properly configured with access key and secret.
 
