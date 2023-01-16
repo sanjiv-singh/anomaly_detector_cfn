@@ -21,10 +21,12 @@ task1() {
 codedeploy_setup() {
     aws iam create-role \
         --role-name codedeploy-service-role \
+        --no-cli-pager \
         --assume-role-policy-document file://templates/code_policy.json
 
     aws iam attach-role-policy \
         --role-name codedeploy-service-role \
+        --no-cli-pager \
         --policy-arn arn:aws:iam::aws:policy/service-role/AWSCodeDeployRole
     
     role_arn=$(aws iam get-role --role-name codedeploy-service-role --query "Role.Arn" --output text)

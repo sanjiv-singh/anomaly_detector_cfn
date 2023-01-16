@@ -19,6 +19,8 @@ The template expects two parameters, viz. `KeyName` (name of keypair), `AnomalyA
 
 The `deploy.sh` script may be used for running all the three tasks. For this to work, the above parameters must be stored in the `templates/params.json` file. The provided script runs on Linux (Unix) and Mac systems only. It is assumed that aws cli is installed on the system and properly configured with access key and secret.
 
+In the lambda_hander code in `anomaly_detection.py` change the `topic_arn` in line number 22 to as per the account being used to deploy the project.
+
 ```console
 foo@bar:~$ cd <project dir>
 foo@bar:~$ chmod 755 deploy.sh
